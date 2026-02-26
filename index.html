@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juh Morangos e Congelados</title>
+    <style>
+        :root {
+            --primary: #E21B3C; /* Vermelho Morango */
+            --secondary: #4CAF50; /* Verde folha */
+            --bg: #f9f9f9;
+            --text: #333;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; padding: 0; background-color: var(--bg); color: var(--text); padding-bottom: 80px; }
+        
+        /* === MUDANÇA NO CABEÇALHO AQUI === */
+        header { 
+            /* Coloque o link da sua imagem de fundo entre as aspas abaixo: */
+            background-image: url('https://i.postimg.cc/xdGbrSTr/Sem-titulo-1.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            
+            color: white; 
+            padding: 20px; 
+            text-align: center; 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header h1 { 
+            margin: 0; 
+            font-size: 24px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8); /* Sombra no texto para leitura fácil */
+        }
+        /* ================================== */
+        
+        .loja-logo {
+            max-width: 150px; 
+            height: auto;
+            margin-bottom: 10px;
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1; /* Garante que a logo fique acima do overlay da imagem */
+        }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 15px; }
+
+        .form-section { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="date"], input[type="number"], select {
+            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 16px;
+        }
+        .hidden { display: none !important; }
+
+        .search-bar { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-bar input { flex-grow: 1; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-secondary { background-color: #ccc; color: black; }
+
+        .categoria-menu {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            scrollbar-width: none; 
+        }
+        .categoria-menu::-webkit-scrollbar { display: none; }
+        
+        .btn-categoria {
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 8px 15px;
+            border-radius: 20px;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .btn-categoria:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .categoria-titulo {
+            font-size: 22px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .produtos-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .produto-card { background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        .produto-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        .promocao-badge { position: absolute; top: 10px; right: 10px; background: #ffcc00; color: #d32f2f; font-weight: bold; padding: 5px 10px; border-radius: 20px; font-size: 12px; }
+        .produto-info { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; }
+        .produto-nome { font-size: 18px; font-weight: bold; margin: 0 0 5px 0; }
+        .produto-desc { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .produto-preco { font-size: 18px; font-weight: bold; color: var(--secondary); margin-bottom: 10px; }
+        .esgotado-overlay { position: absolute; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: red; z-index: 10; }
+        
+        .add-cart { display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+        .add-cart button { width: 35px; height: 35px; font-size: 20px; border: none; background: var(--primary); color: white; border-radius: 5px; cursor: pointer; }
+        .add-cart span { font-weight: bold; font-size: 18px; }
+
+        .sticky-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+            padding: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 1000;
+        }
+        .cart-info { display: flex; flex-direction: column; }
+        .cart-total { font-size: 18px; font-weight: bold; color: var(--secondary); }
+        .btn-whatsapp { background-color: #25D366; color: white; }
+
+        #loading { text-align: center; padding: 20px; font-weight: bold; }
+
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 2000; padding: 15px;
+        }
+        .modal-content {
+            background: white; padding: 20px; border-radius: 8px; width: 100%; max-width: 500px;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .modal-content h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        #resumoPedidoHtml { margin-bottom: 20px; font-size: 16px; line-height: 1.5; }
+        #resumoPedidoHtml p { margin: 5px 0; }
+        #resumoPedidoHtml ul { margin: 5px 0; padding-left: 20px; }
+        .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+        .modal-buttons .btn { flex-grow: 1; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.postimg.cc/sXbc8CJW/juh-morangos4.png" alt="Logo Juh Morangos" class="loja-logo">
+        <h1>Morangos e Congelados</h1>
+    </header>
+
+    <div class="container">
+        <div class="form-section">
+            <h3>📝 Dados do Pedido</h3>
+            <div class="form-group">
+                <label>Nome do Cliente:</label>
+                <input type="text" id="clienteNome" placeholder="Seu nome completo">
+            </div>
+            
+            <div class="form-group">
+                <label>Como deseja receber?</label>
+                <select id="tipoEntrega" onchange="toggleEntrega()">
+                    <option value="">Selecione...</option>
+                    <option value="Entrega">Entrega</option>
+                    <option value="Retirada">Retirada no Local</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="divEnderecoCliente">
+                <label>Endereço de Entrega:</label>
+                <input type="text" id="enderecoCliente" placeholder="Rua, Número, Bairro, Ponto de Referência">
+            </div>
+
+            <div class="form-group hidden" id="divEnderecoLoja">
+                <label>Endereço para Retirada:</label>
+                <input type="text" value="Rua Marechal Deodoro Nº 35, Jardinópolis-SP" readonly style="background-color: #e9ecef;">
+            </div>
+
+            <div class="form-group">
+                <label>Data de Entrega/Retirada:</label>
+                <input type="date" id="dataPedido">
+            </div>
+
+            <div class="form-group">
+                <label>Forma de Pagamento:</label>
+                <select id="formaPagamento" onchange="togglePagamento()">
+                    <option value="">Selecione...</option>
+                    <option value="Pix">Pix</option>
+                    <option value="Dinheiro">Dinheiro</option>
+                </select>
+            </div>
+
+            <div class="form-group hidden" id="divTroco">
+                <label>Precisa de troco para quanto?</label>
+                <input type="text" id="troco" placeholder="Ex: Notas de 50,00 ou Não preciso">
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Buscar produtos...">
+            <button class="btn btn-primary" onclick="buscarProdutos()">Buscar</button>
+            <button class="btn btn-secondary" onclick="limparBusca()">X</button>
+        </div>
+
+        <div id="menuCategorias" class="categoria-menu"></div>
+
+        <div id="loading">Carregando produtos da planilha...</div>
+        
+        <div id="listaProdutos">
+            </div>
+    </div>
+
+    <div class="sticky-footer">
+        <div class="cart-info">
+            <span id="itensCount">0 itens selecionados</span>
+            <span class="cart-total" id="valorTotal">Total: R$ 0,00</span>
+        </div>
+        <button class="btn btn-whatsapp" onclick="abrirRevisao()">Revisar Pedido 📋</button>
+    </div>
+
+    <div id="modalRevisao" class="modal hidden">
+        <div class="modal-content">
+            <h2>Confira seu Pedido</h2>
+            <div id="resumoPedidoHtml">
+                </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="fecharRevisao()">Voltar e Alterar</button>
+                <button class="btn btn-whatsapp" onclick="confirmarEnvioWhatsApp()">Confirmar e Enviar 📲</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === CONFIGURAÇÕES ===
+        const WHATSAPP_NUMERO = "5512997093704"; // Número da loja
+        
+        // COLOQUE AQUI O LINK DO SEU WEB APP DO APPS SCRIPT:
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbySMCXvSkimbv0w-lIjrTP0bg_0VEpIZ_dlZs5yezfTmB6aTuligyucDSYNKqcWwDfKeA/exec"; 
+        
+        let produtos = [];
+        let carrinho = {};
+        let textoParaWhatsAppGlobal = ""; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const dataInput = document.getElementById('dataPedido');
+            const hoje = new Date().toISOString().split('T')[0];
+            dataInput.setAttribute('min', hoje);
+            
+            if(WEB_APP_URL === "COLE_AQUI_O_LINK_DO_SEU_WEB_APP") {
+                carregarDadosDeTeste();
+            } else {
+                carregarDoGoogleSheets();
+            }
+        });
+
+        // Controles do Formulário
+        function toggleEntrega() {
+            const tipo = document.getElementById('tipoEntrega').value;
+            document.getElementById('divEnderecoCliente').classList.toggle('hidden', tipo !== 'Entrega');
+            document.getElementById('divEnderecoLoja').classList.toggle('hidden', tipo !== 'Retirada');
+        }
+
+        function togglePagamento() {
+            const pagamento = document.getElementById('formaPagamento').value;
+            document.getElementById('divTroco').classList.toggle('hidden', pagamento !== 'Dinheiro');
+        }
+
+        // Busca
+        function buscarProdutos() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            renderizarProdutos(produtos.filter(p => 
+                p.nome.toLowerCase().includes(termo) || 
+                p.tipo.toLowerCase().includes(termo) || 
+                (p.descricao && p.descricao.toLowerCase().includes(termo))
+            ));
+        }
+
+        function limparBusca() {
+            document.getElementById('searchInput').value = '';
+            renderizarProdutos(produtos);
+        }
+
+        // Carrinho
+        function alterarQuantidade(codigo, delta) {
+            if (!carrinho[codigo]) carrinho[codigo] = 0;
+            carrinho[codigo] += delta;
+            if (carrinho[codigo] < 0) carrinho[codigo] = 0;
+            
+            document.getElementById('qtd-' + codigo).innerText = carrinho[codigo];
+            atualizarFooter();
+        }
+
+        function atualizarFooter() {
+            let total = 0;
+            let itens = 0;
+            
+            for (let cod in carrinho) {
+                if (carrinho[cod] > 0) {
+                    const prod = produtos.find(p => p.codigo == cod);
+                    total += carrinho[cod] * parseFloat(prod.preco);
+                    itens += carrinho[cod];
+                }
+            }
+            
+            document.getElementById('itensCount').innerText = `${itens} item(ns) selecionado(s)`;
+            document.getElementById('valorTotal').innerText = `Total: R$ ${total.toFixed(2).replace('.', ',')}`;
+        }
+
+        // Rolagem suave para a categoria
+        function scrollToCategoria(idCategoria) {
+            const elemento = document.getElementById(idCategoria);
+            if(elemento) {
+                const y = elemento.getBoundingClientRect().top + window.scrollY - 20;
+                window.scrollTo({top: y, behavior: 'smooth'});
+            }
+        }
+
+        // Renderização Dividida por Categorias e Menu de Botões
+        function renderizarProdutos(lista) {
+            const divLista = document.getElementById('listaProdutos');
+            const menuCategorias = document.getElementById('menuCategorias');
+            document.getElementById('loading').style.display = 'none';
+            divLista.innerHTML = '';
+            menuCategorias.innerHTML = '';
+
+            if (lista.length === 0) {
+                divLista.innerHTML = '<p>Nenhum produto encontrado.</p>';
+                return;
+            }
+
+            const produtosPorCategoria = {};
+            lista.forEach(prod => {
+                const categoria = prod.tipo || 'Outros';
+                if (!produtosPorCategoria[categoria]) {
+                    produtosPorCategoria[categoria] = [];
+                }
+                produtosPorCategoria[categoria].push(prod);
+            });
+
+            let htmlFinal = '';
+            let htmlMenu = '';
+
+            for (const categoria in produtosPorCategoria) {
+                const idCategoria = "cat-" + categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').toLowerCase();
+
+                htmlMenu += `<button class="btn-categoria" onclick="scrollToCategoria('${idCategoria}')">${categoria}</button>`;
+
+                htmlFinal += `<h2 id="${idCategoria}" class="categoria-titulo">${categoria}</h2>`;
+                
+                htmlFinal += `<div class="produtos-grid">`;
+                
+                produtosPorCategoria[categoria].forEach(prod => {
+                    const qtdAtual = carrinho[prod.codigo] || 0;
+                    
+                    const disponivelStr = prod.disponivel ? String(prod.disponivel).trim().toLowerCase() : "";
+                    const esgotado = disponivelStr === 'não' || disponivelStr === 'nao';
+
+                    const emPromocao = prod.promocao && prod.promocao.toLowerCase() === 'sim';
+                    
+                    htmlFinal += `
+                        <div class="produto-card">
+                            ${esgotado ? '<div class="esgotado-overlay">ESGOTADO</div>' : ''}
+                            ${emPromocao ? '<div class="promocao-badge">PROMOÇÃO</div>' : ''}
+                            <img src="${prod.imagem}" alt="${prod.nome}" class="produto-img" onerror="this.src='https://via.placeholder.com/250x200?text=Sem+Imagem'">
+                            <div class="produto-info">
+                                <span style="font-size:12px; color:#888;">Und/Peso: ${prod.unidade}</span>
+                                <h4 class="produto-nome">${prod.nome}</h4>
+                                <p class="produto-desc">${prod.descricao}</p>
+                                <span class="produto-preco">R$ ${parseFloat(prod.preco).toFixed(2).replace('.', ',')}</span>
+                                
+                                <div class="add-cart">
+                                    <button onclick="alterarQuantidade('${prod.codigo}', -1)" ${esgotado ? 'disabled' : ''}>-</button>
+                                    <span id="qtd-${prod.codigo}">${qtdAtual}</span>
+                                    <button onclick="alterarQuantidade('${prod.codigo}', 1)" ${esgotado ? 'disabled' : ''}>+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                htmlFinal += `</div>`;
+            }
+
+            menuCategorias.innerHTML = htmlMenu;
+            divLista.innerHTML = htmlFinal;
+        }
+
+        // Google Sheets
+        function carregarDoGoogleSheets() {
+            fetch(WEB_APP_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.erro) {
+                        document.getElementById('loading').innerText = "Erro: " + data.erro;
+                        return;
+                    }
+
+                    produtos = data.map(row => ({
+                        codigo: row['Código'],
+                        tipo: row['Tipo'],
+                        nome: row['Produtos'], 
+                        unidade: row['Unidade'],
+                        preco: String(row['Preço']).replace(',', '.'), 
+                        descricao: row['Descrição'],
+                        imagem: row['Imagem (URL)'],
+                        promocao: String(row['Promoção']),
+                        disponivel: String(row['Status'])
+                    })).filter(p => p.nome); 
+                    
+                    renderizarProdutos(produtos);
+                })
+                .catch(error => {
+                    console.error("Erro na requisição:", error);
+                    document.getElementById('loading').innerText = "Erro ao carregar os produtos.";
+                });
+        }
+
+        // Funções da Modal
+        function abrirRevisao() {
+            const nome = document.getElementById('clienteNome').value;
+            const entrega = document.getElementById('tipoEntrega').value;
+            const dataPed = document.getElementById('dataPedido').value;
+            const pagamento = document.getElementById('formaPagamento').value;
+            
+            if(!nome || !entrega || !dataPed || !pagamento) {
+                alert("Por favor, preencha todos os dados do pedido (Nome, Entrega, Data e Pagamento).");
+                return;
+            }
+
+            const dataFormatada = dataPed.split('-').reverse().join('/');
+
+            let total = 0;
+            let temItens = false;
+            let itensListaHtml = "<ul>";
+            let itensTextoZap = "";
+
+            for (let cod in carrinho) {
+                if (carrinho[cod] > 0) {
+                    temItens = true;
+                    const prod = produtos.find(p => p.codigo == cod);
+                    const subtotal = carrinho[cod] * parseFloat(prod.preco);
+                    total += subtotal;
+                    
+                    itensListaHtml += `<li>${carrinho[cod]}x ${prod.nome} - R$ ${subtotal.toFixed(2).replace('.', ',')}</li>`;
+                    itensTextoZap += `- ${carrinho[cod]}x ${prod.nome} (${prod.unidade}) -> R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+                }
+            }
+            itensListaHtml += "</ul>";
+
+            if(!temItens) {
+                alert("Adicione pelo menos um produto ao carrinho antes de revisar!");
+                return;
+            }
+
+            let resumoHtml = `<p><strong>Nome:</strong> ${nome}</p>`;
+            resumoHtml += `<p><strong>Data:</strong> ${dataFormatada}</p>`;
+            resumoHtml += `<p><strong>Tipo:</strong> ${entrega}</p>`;
+            
+            let textoEnderecoZap = "";
+            if(entrega === 'Entrega') {
+                const end = document.getElementById('enderecoCliente').value;
+                if(!end) return alert("Por favor, informe o endereço de entrega.");
+                resumoHtml += `<p><strong>Endereço:</strong> ${end}</p>`;
+                textoEnderecoZap = `*Endereço:* ${end}\n`;
+            } else {
+                resumoHtml += `<p><strong>Retirar em:</strong> Rua Marechal Deodoro Nº 35</p>`;
+                textoEnderecoZap = `*Retirar em:* Rua Marechal Deodoro Nº 35, Jardinópolis-SP\n`;
+            }
+
+            resumoHtml += `<p><strong>Pagamento:</strong> ${pagamento}</p>`;
+            let textoTrocoZap = "";
+            if(pagamento === 'Dinheiro') {
+                const troco = document.getElementById('troco').value || 'Não precisa';
+                resumoHtml += `<p><strong>Troco:</strong> ${troco}</p>`;
+                textoTrocoZap = `*Troco:* ${troco}\n`;
+            }
+
+            resumoHtml += `<hr><p><strong>Itens:</strong></p>${itensListaHtml}`;
+            resumoHtml += `<h3>Total: R$ ${total.toFixed(2).replace('.', ',')}</h3>`;
+
+            document.getElementById('resumoPedidoHtml').innerHTML = resumoHtml;
+
+            textoParaWhatsAppGlobal = `*NOVO PEDIDO - JUH MORANGOS E CONGELADOS* 🍓\n\n`;
+            textoParaWhatsAppGlobal += `*Cliente:* ${nome}\n`;
+            textoParaWhatsAppGlobal += `*Data:* ${dataFormatada}\n`;
+            textoParaWhatsAppGlobal += `*Tipo:* ${entrega}\n`;
+            textoParaWhatsAppGlobal += textoEnderecoZap;
+            textoParaWhatsAppGlobal += `*Pagamento:* ${pagamento}\n`;
+            textoParaWhatsAppGlobal += textoTrocoZap;
+            textoParaWhatsAppGlobal += `\n*ITENS DO PEDIDO:*\n`;
+            textoParaWhatsAppGlobal += itensTextoZap;
+            textoParaWhatsAppGlobal += `\n*TOTAL: R$ ${total.toFixed(2).replace('.', ',')}*`;
+
+            document.getElementById('modalRevisao').classList.remove('hidden');
+        }
+
+        function fecharRevisao() {
+            document.getElementById('modalRevisao').classList.add('hidden');
+        }
+
+        function confirmarEnvioWhatsApp() {
+            const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(textoParaWhatsAppGlobal)}`;
+            window.open(url, '_blank');
+            
+            fecharRevisao();
+            limparFormulario();
+        }
+
+        function limparFormulario() {
+            document.getElementById('clienteNome').value = '';
+            document.getElementById('tipoEntrega').value = '';
+            document.getElementById('enderecoCliente').value = '';
+            document.getElementById('dataPedido').value = '';
+            document.getElementById('formaPagamento').value = '';
+            document.getElementById('troco').value = '';
+            
+            toggleEntrega();
+            togglePagamento();
+            
+            carrinho = {};
+            renderizarProdutos(produtos);
+            atualizarFooter();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>

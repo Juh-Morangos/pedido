@@ -161,7 +161,7 @@
                 <label>Como deseja receber?</label>
                 <select id="tipoEntrega" onchange="toggleEntrega()">
                     <option value="">Selecione...</option>
-                    <option value="Entrega">Entrega</option>
+                    <option value="Entrega">Entrega (Delivery)</option>
                     <option value="Retirada">Retirada no Local</option>
                 </select>
             </div>
@@ -337,10 +337,29 @@
                 produtosPorCategoria[categoria].push(prod);
             });
 
+            // === MUDANÇA AQUI: ORDENANDO AS CATEGORIAS ===
+            // Pega as categorias e organiza: Frutas em 1º, Congelados em 2º, resto alfabético
+            const categoriasOrdenadas = Object.keys(produtosPorCategoria).sort((a, b) => {
+                const catA = a.toLowerCase();
+                const catB = b.toLowerCase();
+                
+                // Prioridade 1: Frutas
+                if (catA.includes('fruta') && !catB.includes('fruta')) return -1;
+                if (!catA.includes('fruta') && catB.includes('fruta')) return 1;
+                
+                // Prioridade 2: Congelados
+                if (catA.includes('congelado') && !catB.includes('congelado')) return -1;
+                if (!catA.includes('congelado') && catB.includes('congelado')) return 1;
+                
+                // O restante fica em ordem alfabética
+                return catA.localeCompare(catB);
+            });
+
             let htmlFinal = '';
             let htmlMenu = '';
 
-            for (const categoria in produtosPorCategoria) {
+            // Agora o laço for passa pelas categorias na ordem que definimos acima
+            for (const categoria of categoriasOrdenadas) {
                 const idCategoria = "cat-" + categoria.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-').toLowerCase();
 
                 htmlMenu += `<button class="btn-categoria" onclick="scrollToCategoria('${idCategoria}')">${categoria}</button>`;
@@ -441,8 +460,11 @@
                     const subtotal = carrinho[cod] * parseFloat(prod.preco);
                     total += subtotal;
                     
-                    itensListaHtml += `<li>${carrinho[cod]}x ${prod.nome} - R$ ${subtotal.toFixed(2).replace('.', ',')}</li>`;
-                    itensTextoZap += `- ${carrinho[cod]}x ${prod.nome} (${prod.unidade}) -> R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+                    const precoUnit = parseFloat(prod.preco).toFixed(2).replace('.', ',');
+                    const unidadeProd = prod.unidade ? prod.unidade : 'un.'; 
+                    
+                    itensListaHtml += `<li>${carrinho[cod]}x ${prod.nome} (R$ ${precoUnit} / ${unidadeProd}) - R$ ${subtotal.toFixed(2).replace('.', ',')}</li>`;
+                    itensTextoZap += `- ${carrinho[cod]}x ${prod.nome} | R$ ${precoUnit} / ${unidadeProd} -> R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
                 }
             }
             itensListaHtml += "</ul>";

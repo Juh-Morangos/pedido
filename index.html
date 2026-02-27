@@ -463,8 +463,8 @@
                     const precoUnit = parseFloat(prod.preco).toFixed(2).replace('.', ',');
                     const unidadeProd = prod.unidade ? prod.unidade : 'un.'; 
                     
-                    itensListaHtml += `<li>${carrinho[cod]}x ${prod.nome} (R$ ${precoUnit} / ${unidadeProd}) - R$ ${subtotal.toFixed(2).replace('.', ',')}</li>`;
-                    itensTextoZap += `- ${carrinho[cod]}x ${prod.nome} | R$ ${precoUnit} / ${unidadeProd} -> R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
+                    itensListaHtml += `<li>${carrinho[cod]} ${prod.nome} (R$ ${precoUnit} / ${unidadeProd}) - R$ ${subtotal.toFixed(2).replace('.', ',')}</li>`;
+                    itensTextoZap += `- ${carrinho[cod]} ${prod.nome} | R$ ${precoUnit} / ${unidadeProd} -> R$ ${subtotal.toFixed(2).replace('.', ',')}\n`;
                 }
             }
             itensListaHtml += "</ul>";
